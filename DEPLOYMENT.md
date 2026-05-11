@@ -37,20 +37,16 @@ You'll see a green checkmark ✅ when deployment succeeds.
 
 ### 1.5 Set Environment Variables
 
-Railway should auto-create `DATABASE_URL`. Set these manually:
+Railway should auto-create `DATABASE_URL`. Set this manually:
 
 1. In your service, go to **"Variables"** tab
-2. Add these variables:
+2. Add this variable:
 
 ```
 JWT_SECRET = my-secret-key-123456
-AWS_ACCESS_KEY_ID = test
-AWS_SECRET_ACCESS_KEY = test
-S3_BUCKET_NAME = test-bucket
-AWS_REGION = us-east-1
 ```
 
-(We'll set up real AWS S3 later. For now, these are dummy values.)
+That's it! No storage service needed for now.
 
 ### 1.6 Test Your Backend
 
@@ -176,10 +172,6 @@ Must be set in Railway Variables:
 
 - ✅ `DATABASE_URL` — Auto-created by Railway
 - ✅ `JWT_SECRET` — Set to any random string
-- ✅ `AWS_ACCESS_KEY_ID` — For S3 (can be dummy for now)
-- ✅ `AWS_SECRET_ACCESS_KEY` — For S3 (can be dummy for now)
-- ✅ `S3_BUCKET_NAME` — For S3 (can be dummy for now)
-- ✅ `AWS_REGION` — Set to `us-east-1`
 
 ### On Vercel (Dashboard)
 
@@ -270,20 +262,7 @@ Location: /home/user/communityapp/ios/
 - Test profile creation flow
 ```
 
-### Step 2: Set Up Real AWS S3
-
-Right now S3 credentials are dummy values. To store real videos:
-
-1. Create AWS account (free tier)
-2. Create S3 bucket
-3. Generate access keys
-4. Update Railway variables:
-   - `AWS_ACCESS_KEY_ID`
-   - `AWS_SECRET_ACCESS_KEY`
-   - `S3_BUCKET_NAME`
-5. Make bucket public for video access
-
-### Step 3: Invite Admins
+### Step 2: Invite Admins
 
 To add more admin users:
 

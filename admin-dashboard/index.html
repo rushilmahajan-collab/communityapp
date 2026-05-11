@@ -197,6 +197,7 @@
       padding: 24px;
       border-radius: 12px;
       border-left: 4px solid var(--earth);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     .stat-label {
@@ -213,52 +214,47 @@
       color: var(--gray-900);
     }
 
-    .verification-card {
-      background: white;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 20px;
+    .user-item {
       display: flex;
-      gap: 20px;
-    }
-
-    .video-player {
-      width: 300px;
-      height: 200px;
-      background: #000;
-      border-radius: 8px;
-      display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      color: white;
+      padding: 16px;
+      border-bottom: 1px solid #e0e0e0;
     }
 
-    .video-player video {
-      max-width: 100%;
-      max-height: 100%;
-      border-radius: 8px;
+    .user-item:last-child {
+      border-bottom: none;
     }
 
-    .verification-info {
-      flex: 1;
-    }
-
-    .verification-info h3 {
-      font-size: 18px;
-      margin-bottom: 8px;
+    .user-info h4 {
+      font-size: 16px;
+      margin-bottom: 4px;
       color: var(--gray-900);
     }
 
-    .verification-info p {
+    .user-info p {
+      font-size: 13px;
       color: var(--gray-600);
+    }
+
+    .log-item {
+      padding: 16px;
+      border-bottom: 1px solid #e0e0e0;
       font-size: 14px;
+    }
+
+    .log-item:last-child {
+      border-bottom: none;
+    }
+
+    .log-timestamp {
+      color: var(--gray-600);
+      font-size: 12px;
       margin-bottom: 4px;
     }
 
-    .verification-actions {
-      margin-top: 16px;
-      display: flex;
-      gap: 12px;
+    .log-action {
+      color: var(--gray-900);
     }
 
     .btn {
@@ -328,14 +324,6 @@
       .stats-grid {
         grid-template-columns: 1fr;
       }
-
-      .verification-card {
-        flex-direction: column;
-      }
-
-      .video-player {
-        width: 100%;
-      }
     }
   </style>
 </head>
@@ -344,7 +332,7 @@
   <div class="login-container" id="loginPage">
     <div class="login-box">
       <h1>Admin Dashboard</h1>
-      <p>Sign in to manage verifications and view analytics</p>
+      <p>Sign in to manage your community</p>
       <form onsubmit="login(event)">
         <div class="form-group">
           <label>API URL</label>
@@ -368,25 +356,15 @@
   <div class="dashboard-container" id="dashboardPage">
     <div class="sidebar">
       <h2>Community App</h2>
-      <button class="nav-item active" onclick="showPage('verifications')">📹 Verifications</button>
-      <button class="nav-item" onclick="showPage('stats')">📊 Statistics</button>
+      <button class="nav-item active" onclick="showPage('stats')">📊 Statistics</button>
       <button class="nav-item" onclick="showPage('users')">👥 Users</button>
       <button class="nav-item" onclick="showPage('logs')">📋 Activity Log</button>
       <button class="logout-btn" onclick="logout()">Sign Out</button>
     </div>
 
     <div class="main-content">
-      <!-- Verifications Page -->
-      <div class="page active" id="verifications">
-        <h1 class="page-title">Video Verifications</h1>
-        <p style="color: var(--gray-600); margin-bottom: 24px;">Review pending user video verifications</p>
-        <div id="verificationsList">
-          <div class="loading"><div class="spinner"></div></div>
-        </div>
-      </div>
-
       <!-- Statistics Page -->
-      <div class="page" id="stats">
+      <div class="page active" id="stats">
         <h1 class="page-title">Dashboard Statistics</h1>
         <div id="statsList">
           <div class="loading"><div class="spinner"></div></div>
@@ -396,7 +374,7 @@
       <!-- Users Page -->
       <div class="page" id="users">
         <h1 class="page-title">User Management</h1>
-        <p style="color: var(--gray-600); margin-bottom: 24px;">Search and manage users</p>
+        <p style="color: var(--gray-600); margin-bottom: 24px;">View and manage users</p>
         <div class="card">
           <input type="text" id="userSearch" placeholder="Search by name or email..." style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px;">
         </div>
@@ -408,7 +386,7 @@
       <!-- Logs Page -->
       <div class="page" id="logs">
         <h1 class="page-title">Activity Log</h1>
-        <p style="color: var(--gray-600); margin-bottom: 24px;">Audit trail of all admin actions</p>
+        <p style="color: var(--gray-600); margin-bottom: 24px;">Audit trail of admin actions</p>
         <div id="logsList">
           <div class="loading"><div class="spinner"></div></div>
         </div>
@@ -419,6 +397,7 @@
   <script>
     let apiUrl = '';
     let token = '';
+    let allUsers = [];
 
     async function login(event) {
       event.preventDefault();
@@ -450,7 +429,7 @@
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('dashboardPage').style.display = 'flex';
 
-        loadVerifications();
+        loadStats();
       } catch (err) {
         errorEl.textContent = 'Network error: ' + err.message;
         errorEl.style.display = 'block';
@@ -472,94 +451,9 @@
       document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
       event.target.classList.add('active');
 
-      if (pageId === 'verifications') loadVerifications();
       if (pageId === 'stats') loadStats();
+      if (pageId === 'users') loadUsers();
       if (pageId === 'logs') loadLogs();
-    }
-
-    async function loadVerifications() {
-      const container = document.getElementById('verificationsList');
-      container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-
-      try {
-        const response = await fetch(`${apiUrl}/admin/videos/pending`, {
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
-
-        const data = await response.json();
-
-        if (data.videos.length === 0) {
-          container.innerHTML = '<div class="card"><p style="text-align: center; color: var(--gray-600);">No pending verifications</p></div>';
-          return;
-        }
-
-        container.innerHTML = data.videos.map(video => `
-          <div class="verification-card">
-            <div class="video-player">
-              <video controls src="${video.video_verification_url}"></video>
-            </div>
-            <div class="verification-info">
-              <h3>${video.first_name}</h3>
-              <p><strong>Email:</strong> ${video.email}</p>
-              <p><strong>City:</strong> ${video.city}</p>
-              <p><strong>Submitted:</strong> ${new Date(video.created_at).toLocaleDateString()}</p>
-              <div class="verification-actions">
-                <button class="btn btn-primary" onclick="approveVerification('${video.id}')">✓ Approve</button>
-                <button class="btn btn-danger" onclick="rejectVerification('${video.id}')">✗ Reject</button>
-              </div>
-            </div>
-          </div>
-        `).join('');
-      } catch (err) {
-        container.innerHTML = `<div class="card"><p style="color: var(--red);">Error loading verifications: ${err.message}</p></div>`;
-      }
-    }
-
-    async function approveVerification(userId) {
-      try {
-        const response = await fetch(`${apiUrl}/admin/videos/approve/${userId}`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ notes: 'Approved via admin dashboard' }),
-        });
-
-        if (response.ok) {
-          alert('User verified!');
-          loadVerifications();
-        } else {
-          alert('Error approving user');
-        }
-      } catch (err) {
-        alert('Error: ' + err.message);
-      }
-    }
-
-    async function rejectVerification(userId) {
-      const reason = prompt('Why reject this verification?');
-      if (!reason) return;
-
-      try {
-        const response = await fetch(`${apiUrl}/admin/videos/reject/${userId}`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ reason }),
-        });
-
-        if (response.ok) {
-          alert('Verification rejected');
-          loadVerifications();
-        } else {
-          alert('Error rejecting verification');
-        }
-      } catch (err) {
-        alert('Error: ' + err.message);
-      }
     }
 
     async function loadStats() {
@@ -571,46 +465,86 @@
           headers: { 'Authorization': `Bearer ${token}` },
         });
 
+        if (!response.ok) throw new Error('Failed to load stats');
+
         const data = await response.json();
 
         container.innerHTML = `
           <div class="stats-grid">
             <div class="stat-card">
               <div class="stat-label">Total Users</div>
-              <div class="stat-value">${data.users.total}</div>
+              <div class="stat-value">${data.total_users || 0}</div>
             </div>
             <div class="stat-card">
-              <div class="stat-label">Verified Users</div>
-              <div class="stat-value">${data.users.verified}</div>
+              <div class="stat-label">Groups Created</div>
+              <div class="stat-value">${data.total_groups || 0}</div>
             </div>
             <div class="stat-card">
-              <div class="stat-label">Verification Rate</div>
-              <div class="stat-value">${data.users.verificationRate}</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Total Groups</div>
-              <div class="stat-value">${data.groups.total}</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Total Messages</div>
-              <div class="stat-value">${data.messaging.totalMessages}</div>
+              <div class="stat-label">Messages Sent</div>
+              <div class="stat-value">${data.total_messages || 0}</div>
             </div>
             <div class="stat-card">
               <div class="stat-label">Hangouts Completed</div>
-              <div class="stat-value">${data.hangouts.completed}</div>
+              <div class="stat-value">${data.total_hangouts || 0}</div>
             </div>
-          </div>
-
-          <div class="card">
-            <h3>Groups by City</h3>
-            ${data.groups.byCity.map(city => `
-              <p style="margin-bottom: 8px;"><strong>${city.city}:</strong> ${city.count} groups</p>
-            `).join('')}
           </div>
         `;
       } catch (err) {
-        container.innerHTML = `<div class="card"><p style="color: var(--red);">Error loading stats: ${err.message}</p></div>`;
+        container.innerHTML = `<div class="card"><p style="text-align: center; color: var(--red);">Failed to load statistics</p></div>`;
       }
+    }
+
+    async function loadUsers() {
+      const container = document.getElementById('usersList');
+      container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+      try {
+        const response = await fetch(`${apiUrl}/users`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+
+        if (!response.ok) throw new Error('Failed to load users');
+
+        const data = await response.json();
+        allUsers = data.users || [];
+
+        renderUsers(allUsers);
+
+        // Setup search
+        document.getElementById('userSearch').addEventListener('input', (e) => {
+          const query = e.target.value.toLowerCase();
+          const filtered = allUsers.filter(u =>
+            u.first_name.toLowerCase().includes(query) ||
+            u.email.toLowerCase().includes(query)
+          );
+          renderUsers(filtered);
+        });
+      } catch (err) {
+        container.innerHTML = `<div class="card"><p style="text-align: center; color: var(--red);">Failed to load users</p></div>`;
+      }
+    }
+
+    function renderUsers(users) {
+      const container = document.getElementById('usersList');
+
+      if (users.length === 0) {
+        container.innerHTML = '<div class="card"><p style="text-align: center; color: var(--gray-600);">No users found</p></div>';
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="card">
+          ${users.map(user => `
+            <div class="user-item">
+              <div class="user-info">
+                <h4>${user.first_name}</h4>
+                <p>${user.email}</p>
+                <p>${user.city}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
     }
 
     async function loadLogs() {
@@ -622,36 +556,42 @@
           headers: { 'Authorization': `Bearer ${token}` },
         });
 
-        const data = await response.json();
+        if (!response.ok) throw new Error('Failed to load logs');
 
-        if (data.logs.length === 0) {
-          container.innerHTML = '<div class="card"><p style="text-align: center; color: var(--gray-600);">No activity yet</p></div>';
+        const data = await response.json();
+        const logs = data.logs || [];
+
+        if (logs.length === 0) {
+          container.innerHTML = '<div class="card"><p style="text-align: center; color: var(--gray-600);">No activity logs yet</p></div>';
           return;
         }
 
-        container.innerHTML = data.logs.map(log => `
+        container.innerHTML = `
           <div class="card">
-            <p><strong>${log.action}</strong> - ${new Date(log.created_at).toLocaleString()}</p>
-            ${log.reason ? `<p style="color: var(--gray-600); margin-top: 8px;">${log.reason}</p>` : ''}
-            ${log.notes ? `<p style="color: var(--gray-600); margin-top: 8px;">${log.notes}</p>` : ''}
+            ${logs.map(log => `
+              <div class="log-item">
+                <div class="log-timestamp">${new Date(log.created_at).toLocaleString()}</div>
+                <div class="log-action">${log.action}</div>
+              </div>
+            `).join('')}
           </div>
-        `).join('');
+        `;
       } catch (err) {
-        container.innerHTML = `<div class="card"><p style="color: var(--red);">Error loading logs: ${err.message}</p></div>`;
+        container.innerHTML = `<div class="card"><p style="text-align: center; color: var(--red);">Failed to load activity logs</p></div>`;
       }
     }
 
-    // On page load, check if already logged in
+    // Restore session on page load
     window.addEventListener('load', () => {
       const savedToken = localStorage.getItem('adminToken');
-      const savedUrl = localStorage.getItem('adminApiUrl');
+      const savedApiUrl = localStorage.getItem('adminApiUrl');
 
-      if (savedToken && savedUrl) {
+      if (savedToken && savedApiUrl) {
         token = savedToken;
-        apiUrl = savedUrl;
+        apiUrl = savedApiUrl;
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('dashboardPage').style.display = 'flex';
-        loadVerifications();
+        loadStats();
       }
     });
   </script>

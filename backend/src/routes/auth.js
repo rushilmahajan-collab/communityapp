@@ -89,7 +89,6 @@ router.post('/login', async (req, res) => {
         first_name: user.first_name,
         email: user.email,
         city: user.city,
-        verification_status: user.verification_status,
       },
       token,
     });
@@ -112,7 +111,6 @@ router.get('/me', authenticate, async (req, res) => {
       city: user.city,
       neighborhood: user.neighborhood,
       profile_photo_url: user.profile_photo_url,
-      verification_status: user.verification_status,
       latitude: user.latitude,
       longitude: user.longitude,
     });

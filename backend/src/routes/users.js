@@ -30,32 +30,9 @@ router.put('/profile', authenticate, async (req, res) => {
       city: user.city,
       neighborhood: user.neighborhood,
       profile_photo_url: user.profile_photo_url,
-      verification_status: user.verification_status,
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update profile' });
-  }
-});
-
-router.post('/verify', authenticate, async (req, res) => {
-  try {
-    const { video_verification_url } = req.body;
-
-    const [user] = await db('users')
-      .where({ id: req.userId })
-      .update({
-        video_verification_url,
-        verification_status: 'pending',
-        updated_at: db.fn.now(),
-      })
-      .returning('*');
-
-    res.json({
-      id: user.id,
-      verification_status: user.verification_status,
-    });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to upload verification video' });
   }
 });
 

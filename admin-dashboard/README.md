@@ -4,9 +4,8 @@ A web-based admin dashboard for managing user verifications, reviewing videos, a
 
 ## ✨ Features
 
-- **Video Verification Review** — Queue of pending users, built-in video player, approve/reject
 - **Dashboard Stats** — Real-time metrics on users, groups, engagement
-- **User Management** — Search, view profiles, flag suspicious activity
+- **User Management** — Search and view user profiles
 - **Activity Logs** — Audit trail of all admin actions
 
 ## 🚀 Quick Start (Works with Railway Backend)
@@ -43,16 +42,14 @@ Admin Dashboard (HTML/JS)
         ↓
 Railway Backend
         ↓
-PostgreSQL + S3
+PostgreSQL Database
 ```
 
 When users register:
-1. Upload verification video
-2. Video goes to AWS S3
-3. S3 URL stored in database
-4. Admin dashboard fetches from S3
-5. Admin approves/rejects
-6. Decision saved to database
+1. User creates profile with quiz responses
+2. Data stored in PostgreSQL database
+3. Admin can view user profiles and statistics
+4. Admin can track community engagement
 
 ## 🌐 Deploy Admin Dashboard
 
@@ -86,31 +83,22 @@ The dashboard uses JWT tokens:
 
 ## 📊 Admin Features
 
-### Video Verification Queue
-- Pending verifications (oldest first)
-- Video player with controls
-- User name, email, city
-- Approve button: Mark user as verified
-- Reject button: Return video for resubmission
-
 ### Statistics Dashboard
-- **Users**: Total, verified, pending, rejection rate
-- **Groups**: By city, total count
-- **Engagement**: Messages, hangouts completed
-- **Activity**: Users joined this week
+- **Users**: Total user count
+- **Groups**: Total groups created
+- **Engagement**: Messages and hangouts completed
+- **Community Growth**: Real-time metrics
 
 ### User Management
-- Search users
-- View detailed profiles
-- See group memberships
-- View activity stats
-- Flag for review (low/medium/high severity)
+- Search users by name or email
+- View user profiles with registration info
+- See location and city information
+- Track user joining dates
 
 ### Activity Log
 - All admin actions logged
-- Approval/rejection history
-- User flags
-- Timestamps and notes
+- Timestamps on all activities
+- Action audit trail
 
 ## 🛠️ Environment Variables (Railway Backend)
 
@@ -119,9 +107,6 @@ Your Railway backend needs:
 ```env
 DATABASE_URL=postgresql://...  # Railway Postgres
 JWT_SECRET=your-secret-key      # For JWT tokens
-AWS_ACCESS_KEY_ID=...           # For S3
-AWS_SECRET_ACCESS_KEY=...       # For S3
-S3_BUCKET_NAME=your-bucket      # Video storage
 ```
 
 ## 📱 Mobile-Friendly
@@ -141,25 +126,22 @@ Dashboard is responsive:
 
 ## 🚧 Admin Workflow
 
-### Daily Verification Review (5 minutes)
+### Daily Community Management (5 minutes)
 
 1. Open admin dashboard
-2. Go to **Verifications** tab
-3. Watch pending videos
-4. Click **Approve** or **Reject**
-5. Check **Stats** to see metrics
+2. Check **Statistics** for community growth
+3. View **Users** tab to see new registrations
+4. Review **Activity Log** for engagement metrics
 
 ## 🆚 Admin API Endpoints
 
 The dashboard uses these endpoints:
 
 ```
-POST   /api/auth/login                    # Login with email/password
-GET    /api/admin/videos/pending          # Get pending verifications
-POST   /api/admin/videos/approve/:userId  # Approve user
-POST   /api/admin/videos/reject/:userId   # Reject user
-GET    /api/admin/stats                   # Get dashboard stats
-GET    /api/admin/logs                    # Get activity logs
+POST   /api/auth/login         # Login with email/password
+GET    /api/admin/stats        # Get dashboard statistics
+GET    /api/users              # Get all users
+GET    /api/admin/logs         # Get activity logs
 ```
 
 See `backend/ADMIN_API.md` for full documentation.
@@ -171,22 +153,23 @@ See `backend/ADMIN_API.md` for full documentation.
 - Verify Railway backend is running
 - Check firewall/CORS settings
 
-### "Can't see videos"
-- Verify AWS S3 credentials
-- Check bucket name is correct
-- Videos must have public read access
+### "Invalid credentials"
+- Make sure you created an admin user on the backend
+- Check email and password are correct
+- The first registered user is automatically an admin
 
-### "Admin access required"
-- Make sure you're the first user (auto admin)
-- Check `is_admin` column in database
+### "No users showing up"
+- Wait a few minutes for data to load
+- Verify users have registered on the iOS app
+- Check Railway backend is connected to PostgreSQL
 
 ## 📝 Notes
 
 - Dashboard is pure HTML/CSS/JS — no build step
 - Edit `index.html` directly to customize
-- Videos fetched directly from S3 URLs
-- No video transcoding — supports MP4, WebM, etc.
+- No external dependencies needed
 - Token stored in localStorage (clears on logout)
+- All data pulled directly from PostgreSQL via backend API
 
 ## 📚 Learn More
 
