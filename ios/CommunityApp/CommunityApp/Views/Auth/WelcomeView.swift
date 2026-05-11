@@ -41,7 +41,9 @@ struct WelcomeView: View {
             .cornerRadius(12)
         }
 
-        Button(action: { showAppleSignIn = true }) {
+        Button(action: {
+          authManager.signInWithApple()
+        }) {
           HStack(spacing: 8) {
             Image(systemName: "apple.logo")
             Text("Sign in with Apple")
@@ -58,7 +60,7 @@ struct WelcomeView: View {
           authManager.signInWithGoogle()
         }) {
           HStack(spacing: 8) {
-            Image(systemName: "globe")
+            Image(systemName: "g.circle.fill")
             Text("Sign in with Google")
           }
           .font(.system(size: 16, weight: .semibold))

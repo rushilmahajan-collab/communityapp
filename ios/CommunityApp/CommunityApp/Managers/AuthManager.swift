@@ -108,9 +108,17 @@ class AuthManager: NSObject, ObservableObject, ASAuthorizationControllerDelegate
   }
 
   func signInWithGoogle() {
-    // Google Sign In would require Google SDK integration
-    // For now, show a placeholder message
-    errorMessage = "Google Sign In coming soon"
+    // Create a demo user for Google Sign In
+    // In production, this would use Google's OAuth SDK
+    Task {
+      await signInWithOAuth(
+        provider: "google",
+        providerID: "demo-google-\(UUID().uuidString)",
+        email: "user@gmail.com",
+        firstName: "Google User",
+        idToken: nil
+      )
+    }
   }
 
   func authorizationController(
