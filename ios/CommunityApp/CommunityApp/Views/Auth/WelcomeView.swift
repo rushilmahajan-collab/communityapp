@@ -1,8 +1,10 @@
 import SwiftUI
+import AuthenticationServices
 
 struct WelcomeView: View {
   @EnvironmentObject var authManager: AuthManager
   @State private var showLogin = false
+  @State private var showAppleSignIn = false
 
   var body: some View {
     VStack(spacing: 40) {
@@ -39,6 +41,35 @@ struct WelcomeView: View {
             .cornerRadius(12)
         }
 
+        Button(action: { showAppleSignIn = true }) {
+          HStack(spacing: 8) {
+            Image(systemName: "apple.logo")
+            Text("Sign in with Apple")
+          }
+          .font(.system(size: 16, weight: .semibold))
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 14)
+          .background(Color.gray900)
+          .foregroundColor(.white)
+          .cornerRadius(12)
+        }
+
+        Button(action: {
+          authManager.signInWithGoogle()
+        }) {
+          HStack(spacing: 8) {
+            Image(systemName: "globe")
+            Text("Sign in with Google")
+          }
+          .font(.system(size: 16, weight: .semibold))
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 14)
+          .background(Color.white)
+          .foregroundColor(.gray900)
+          .cornerRadius(12)
+          .border(Color.gray200, width: 1)
+        }
+
         Button(action: { showLogin = true }) {
           Text("I already have an account")
             .font(.system(size: 16, weight: .semibold))
@@ -55,6 +86,10 @@ struct WelcomeView: View {
     }
     .navigationDestination(isPresented: $showLogin) {
       LoginView()
+    }
+    .signInWithAppleButtonStyle(.white)
+    .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("AppleSignInSuccess"))) { _ in
+      // Apple sign-in successful, AuthManager handles navigation
     }
   }
 }

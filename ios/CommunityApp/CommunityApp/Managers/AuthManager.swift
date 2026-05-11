@@ -1,7 +1,8 @@
 import Foundation
+import AuthenticationServices
 
 @MainActor
-class AuthManager: ObservableObject {
+class AuthManager: NSObject, ObservableObject, ASAuthorizationControllerDelegate {
   @Published var isLoggedIn = false
   @Published var currentUser: User?
   @Published var isLoading = false
@@ -30,8 +31,7 @@ class AuthManager: ObservableObject {
           id: userData["id"] as? String ?? "",
           firstName: userData["first_name"] as? String ?? "",
           email: userData["email"] as? String ?? "",
-          city: userData["city"] as? String ?? "",
-          verificationStatus: .pending
+          city: userData["city"] as? String ?? ""
         )
         currentUser = user
         KeychainManager.saveToken(token)
@@ -60,8 +60,7 @@ class AuthManager: ObservableObject {
           id: userData["id"] as? String ?? "",
           firstName: userData["first_name"] as? String ?? "",
           email: userData["email"] as? String ?? "",
-          city: userData["city"] as? String ?? "",
-          verificationStatus: VerificationStatus(rawValue: userData["verification_status"] as? String ?? "pending") ?? .pending
+          city: userData["city"] as? String ?? ""
         )
         currentUser = user
         KeychainManager.saveToken(token)
@@ -88,8 +87,7 @@ class AuthManager: ObservableObject {
             id: userData["id"] as? String ?? "",
             firstName: userData["first_name"] as? String ?? "",
             email: userData["email"] as? String ?? "",
-            city: userData["city"] as? String ?? "",
-            verificationStatus: VerificationStatus(rawValue: userData["verification_status"] as? String ?? "pending") ?? .pending
+            city: userData["city"] as? String ?? ""
           )
           currentUser = user
           isLoggedIn = true
@@ -98,5 +96,91 @@ class AuthManager: ObservableObject {
         logout()
       }
     }
+  }
+
+  func signInWithApple() {
+    let request = ASAuthorizationAppleIDProvider().createRequest()
+    request.requestedScopes = [.fullName, .email]
+
+    let controller = ASAuthorizationController(authorizationRequests: [request])
+    controller.delegate = self
+    controller.performRequests()
+  }
+
+  func signInWithGoogle() {
+    // Google Sign In would require Google SDK integration
+    // For now, show a placeholder message
+    errorMessage = "Google Sign In coming soon"
+  }
+
+  func authorizationController(
+    controller: ASAuthorizationController,
+    didCompleteWithAuthorization authorization: ASAuthorization
+  ) {
+    if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+      let userID = appleIDCredential.user
+      let email = appleIDCredential.email ?? ""
+      let firstName = appleIDCredential.fullName?.givenName ?? "User"
+
+      Task {
+        await signInWithOAuth(
+          provider: "apple",
+          providerID: userID,
+          email: email,
+          firstName: firstName,
+          idToken: appleIDCredential.identityToken
+        )
+      }
+    }
+  }
+
+  func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+    errorMessage = "Apple Sign In failed: \(error.localizedDescription)"
+  }
+
+  private func signInWithOAuth(
+    provider: String,
+    providerID: String,
+    email: String,
+    firstName: String,
+    idToken: Data?
+  ) async {
+    isLoading = true
+    errorMessage = nil
+
+    do {
+      var body: [String: Any] = [
+        "provider": provider,
+        "provider_id": providerID,
+        "email": email,
+        "first_name": firstName,
+      ]
+
+      if let token = idToken {
+        body["id_token"] = token.base64EncodedString()
+      }
+
+      let response = try await apiClient.post(
+        endpoint: "/api/auth/oauth",
+        body: body
+      ) as? [String: Any]
+
+      if let userData = response?["user"] as? [String: Any],
+        let token = response?["token"] as? String {
+        let user = User(
+          id: userData["id"] as? String ?? "",
+          firstName: userData["first_name"] as? String ?? "",
+          email: userData["email"] as? String ?? "",
+          city: userData["city"] as? String ?? ""
+        )
+        currentUser = user
+        KeychainManager.saveToken(token)
+        isLoggedIn = true
+      }
+    } catch {
+      errorMessage = "OAuth sign-in failed: \(error.localizedDescription)"
+    }
+
+    isLoading = false
   }
 }

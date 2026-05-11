@@ -119,4 +119,47 @@ router.get('/me', authenticate, async (req, res) => {
   }
 });
 
+router.post('/oauth', async (req, res) => {
+  try {
+    const { provider, provider_id, email, first_name } = req.body;
+
+    if (!provider || !provider_id || !email || !first_name) {
+      return res.status(400).json({ error: 'Missing required OAuth fields' });
+    }
+
+    let user = await db('users').where({ email }).first();
+
+    if (!user) {
+      const passwordHash = await hashPassword(`oauth_${provider_id}`);
+      const [newUser] = await db('users')
+        .insert({
+          first_name,
+          email,
+          password_hash: passwordHash,
+          city: 'Unknown',
+          latitude: 0,
+          longitude: 0,
+          is_admin: false,
+        })
+        .returning('*');
+
+      user = newUser;
+    }
+
+    const token = generateToken(user.id);
+
+    res.status(201).json({
+      user: {
+        id: user.id,
+        first_name: user.first_name,
+        email: user.email,
+        city: user.city,
+      },
+      token,
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'OAuth sign-in failed' });
+  }
+});
+
 export default router;
