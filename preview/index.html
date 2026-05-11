@@ -368,6 +368,23 @@
       background: var(--gray-200);
     }
 
+    .option-btn {
+      background: white;
+      border: 1px solid var(--gray-200);
+      padding: 16px;
+      border-radius: 8px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 15px;
+      color: var(--gray-900);
+      transition: all 0.2s;
+    }
+
+    .option-btn:active {
+      background: var(--earth-light);
+      border-color: var(--earth);
+    }
+
     @media (max-width: 1200px) {
       body {
         flex-direction: column;
@@ -414,7 +431,151 @@
             <p>We only ask for first names. Real people, no profiles.</p>
           </div>
           <input type="text" placeholder="First name" id="firstName" class="input">
-          <button class="btn btn-primary" onclick="showScreen('explore')">Next</button>
+          <input type="email" placeholder="Email" id="email" class="input" style="margin-top: 12px;">
+          <input type="password" placeholder="Password" id="password" class="input" style="margin-top: 12px;">
+          <input type="text" placeholder="City" id="city" class="input" style="margin-top: 12px;">
+          <button class="btn btn-primary" onclick="showScreen('quiz-1')">Next</button>
+        </div>
+
+        <!-- Quiz Screens -->
+        <div class="screen-content register" id="quiz-1">
+          <button class="back-button" onclick="showScreen('register')">← Back</button>
+          <div style="margin-bottom: 24px;">
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">Question 1 of 10</div>
+            <h2 style="font-size: 20px; margin-bottom: 16px;">What brought you here?</h2>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button class="option-btn" onclick="showScreen('quiz-2')">I'm new to the city and need my people</button>
+            <button class="option-btn" onclick="showScreen('quiz-2')">I have friends but want a deeper community</button>
+            <button class="option-btn" onclick="showScreen('quiz-2')">I'm tired of surface-level friendships</button>
+            <button class="option-btn" onclick="showScreen('quiz-2')">I just want to get off my couch and do something real</button>
+          </div>
+        </div>
+
+        <div class="screen-content register" id="quiz-2">
+          <button class="back-button" onclick="showScreen('quiz-1')">← Back</button>
+          <div style="margin-bottom: 24px;">
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">Question 2 of 10</div>
+            <h2 style="font-size: 20px; margin-bottom: 16px;">What does your social life look like right now?</h2>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button class="option-btn" onclick="showScreen('quiz-3')">Pretty empty — I'm starting from scratch</button>
+            <button class="option-btn" onclick="showScreen('quiz-3')">I have people but something's missing</button>
+            <button class="option-btn" onclick="showScreen('quiz-3')">It's good but I want more</button>
+            <button class="option-btn" onclick="showScreen('quiz-3')">I mostly hang out alone and I'm ready to change that</button>
+          </div>
+        </div>
+
+        <div class="screen-content register" id="quiz-3">
+          <button class="back-button" onclick="showScreen('quiz-2')">← Back</button>
+          <div style="margin-bottom: 24px;">
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">Question 3 of 10</div>
+            <h2 style="font-size: 20px; margin-bottom: 16px;">What kind of group sounds like home to you?</h2>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button class="option-btn" onclick="showScreen('quiz-4')">Active — hiking, sports, outdoor stuff</button>
+            <button class="option-btn" onclick="showScreen('quiz-4')">Chill — dinners, coffee, good conversations</button>
+            <button class="option-btn" onclick="showScreen('quiz-4')">Growth-focused — goals, accountability, pushing each other</button>
+            <button class="option-btn" onclick="showScreen('quiz-4')">A mix of everything</button>
+          </div>
+        </div>
+
+        <div class="screen-content register" id="quiz-4">
+          <button class="back-button" onclick="showScreen('quiz-3')">← Back</button>
+          <div style="margin-bottom: 24px;">
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">Question 4 of 10</div>
+            <h2 style="font-size: 20px; margin-bottom: 16px;">What matters most in a friend?</h2>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button class="option-btn" onclick="showScreen('quiz-5')">They show up when it counts</button>
+            <button class="option-btn" onclick="showScreen('quiz-5')">They keep it real, no fake stuff</button>
+            <button class="option-btn" onclick="showScreen('quiz-5')">They're fun to be around</button>
+            <button class="option-btn" onclick="showScreen('quiz-5')">They challenge me to be better</button>
+          </div>
+        </div>
+
+        <div class="screen-content register" id="quiz-5">
+          <button class="back-button" onclick="showScreen('quiz-4')">← Back</button>
+          <div style="margin-bottom: 24px;">
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">Question 5 of 10</div>
+            <h2 style="font-size: 20px; margin-bottom: 16px;">How often do you want to meet up?</h2>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button class="option-btn" onclick="showScreen('quiz-6')">Every week</button>
+            <button class="option-btn" onclick="showScreen('quiz-6')">Every other week</button>
+            <button class="option-btn" onclick="showScreen('quiz-6')">A couple times a month</button>
+            <button class="option-btn" onclick="showScreen('quiz-6')">I'm flexible</button>
+          </div>
+        </div>
+
+        <div class="screen-content register" id="quiz-6">
+          <button class="back-button" onclick="showScreen('quiz-5')">← Back</button>
+          <div style="margin-bottom: 24px;">
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">Question 6 of 10</div>
+            <h2 style="font-size: 20px; margin-bottom: 16px;">What time works best for you?</h2>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button class="option-btn" onclick="showScreen('quiz-7')">Weekday mornings</button>
+            <button class="option-btn" onclick="showScreen('quiz-7')">Weekday evenings</button>
+            <button class="option-btn" onclick="showScreen('quiz-7')">Weekends</button>
+            <button class="option-btn" onclick="showScreen('quiz-7')">I'm flexible</button>
+          </div>
+        </div>
+
+        <div class="screen-content register" id="quiz-7">
+          <button class="back-button" onclick="showScreen('quiz-6')">← Back</button>
+          <div style="margin-bottom: 24px;">
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">Question 7 of 10</div>
+            <h2 style="font-size: 20px; margin-bottom: 16px;">What's your vibe?</h2>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button class="option-btn" onclick="showScreen('quiz-8')">Laid back and go with the flow</button>
+            <button class="option-btn" onclick="showScreen('quiz-8')">High energy and always down for something</button>
+            <button class="option-btn" onclick="showScreen('quiz-8')">Quiet but intentional</button>
+            <button class="option-btn" onclick="showScreen('quiz-8')">Depends on the day honestly</button>
+          </div>
+        </div>
+
+        <div class="screen-content register" id="quiz-8">
+          <button class="back-button" onclick="showScreen('quiz-7')">← Back</button>
+          <div style="margin-bottom: 24px;">
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">Question 8 of 10</div>
+            <h2 style="font-size: 20px; margin-bottom: 16px;">What are you hoping to find here?</h2>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button class="option-btn" onclick="showScreen('quiz-9')">A tight group of real friends</button>
+            <button class="option-btn" onclick="showScreen('quiz-9')">People to do life with</button>
+            <button class="option-btn" onclick="showScreen('quiz-9')">A sense of belonging</button>
+            <button class="option-btn" onclick="showScreen('quiz-9')">All of the above</button>
+          </div>
+        </div>
+
+        <div class="screen-content register" id="quiz-9">
+          <button class="back-button" onclick="showScreen('quiz-8')">← Back</button>
+          <div style="margin-bottom: 24px;">
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">Question 9 of 10</div>
+            <h2 style="font-size: 20px; margin-bottom: 16px;">How do you feel about meeting new people?</h2>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button class="option-btn" onclick="showScreen('quiz-10')">I love it, I'm an open book</button>
+            <button class="option-btn" onclick="showScreen('quiz-10')">A little nervous but I'm ready</button>
+            <button class="option-btn" onclick="showScreen('quiz-10')">It takes me a minute to open up</button>
+            <button class="option-btn" onclick="showScreen('quiz-10')">Honestly terrified but I'm here anyway</button>
+          </div>
+        </div>
+
+        <div class="screen-content register" id="quiz-10">
+          <button class="back-button" onclick="showScreen('quiz-9')">← Back</button>
+          <div style="margin-bottom: 24px;">
+            <div style="font-size: 12px; color: var(--gray-600); margin-bottom: 8px;">Question 10 of 10</div>
+            <h2 style="font-size: 20px; margin-bottom: 16px;">Are you ready to show up?</h2>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button class="option-btn" onclick="showScreen('explore')">All in, let's go</button>
+            <button class="option-btn" onclick="showScreen('explore')">Nervous but committed</button>
+            <button class="option-btn" onclick="showScreen('explore')">I need a little push</button>
+            <button class="option-btn" onclick="showScreen('explore')">Just looking around for now</button>
+          </div>
         </div>
 
         <!-- Login Screen -->
@@ -527,6 +688,16 @@
         'welcome': 'WELCOME',
         'register': 'REGISTER',
         'login': 'LOGIN',
+        'quiz-1': 'QUIZ - QUESTION 1',
+        'quiz-2': 'QUIZ - QUESTION 2',
+        'quiz-3': 'QUIZ - QUESTION 3',
+        'quiz-4': 'QUIZ - QUESTION 4',
+        'quiz-5': 'QUIZ - QUESTION 5',
+        'quiz-6': 'QUIZ - QUESTION 6',
+        'quiz-7': 'QUIZ - QUESTION 7',
+        'quiz-8': 'QUIZ - QUESTION 8',
+        'quiz-9': 'QUIZ - QUESTION 9',
+        'quiz-10': 'QUIZ - QUESTION 10',
         'explore': 'EXPLORE',
         'group-detail': 'GROUP DETAIL'
       };
