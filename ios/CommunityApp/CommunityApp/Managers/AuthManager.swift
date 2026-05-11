@@ -146,6 +146,17 @@ class AuthManager: NSObject, ObservableObject, ASAuthorizationControllerDelegate
     errorMessage = "Apple Sign In failed: \(error.localizedDescription)"
   }
 
+  func saveQuizResponses(_ responses: [Int: String]) async {
+    do {
+      _ = try await apiClient.post(
+        endpoint: "/api/users/quiz",
+        body: ["responses": responses]
+      )
+    } catch {
+      errorMessage = "Failed to save quiz responses"
+    }
+  }
+
   private func signInWithOAuth(
     provider: String,
     providerID: String,
