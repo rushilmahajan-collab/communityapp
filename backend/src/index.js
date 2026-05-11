@@ -9,6 +9,7 @@ import usersRoutes from './routes/users.js';
 import groupsRoutes from './routes/groups.js';
 import hangoutsRoutes from './routes/hangouts.js';
 import messagesRoutes from './routes/messages.js';
+import adminRoutes from './routes/admin.js';
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use('/api/users', usersRoutes);
 app.use('/api/groups', groupsRoutes);
 app.use('/api/hangouts', hangoutsRoutes);
 app.use('/api/groups', messagesRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
